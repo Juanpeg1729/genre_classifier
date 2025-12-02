@@ -16,14 +16,15 @@ El repositorio demuestra una arquitectura de software moderna, desacoplando el e
 ---
 
 ## 📋 Tabla de Contenidos
+
 - [Arquitectura y Tech Stack](#-arquitectura-y-tech-stack)
 - [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Automatización (Makefile)](#%EF%B8%8F-automatización-makefile)
 - [Instalación y Uso (Docker & Local)](#-instalación-y-uso)
 - [Dashboard & API](#-dashboard--api)
-- [Metodología de ML](#-metodología-de-ml)
-- [Entrenamiento y resultados](#-entrenamiento-resultado)
+- [Metodología de Data Science](#-metodología-de-data-science)
+- [Entrenamiento y Resultados](#-entrenamiento-y-resultados)
 - [Autor](#-autor)
-
 ---
 
 ## 🛠 Arquitectura y Tech Stack
