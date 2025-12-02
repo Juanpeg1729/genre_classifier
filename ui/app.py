@@ -4,12 +4,14 @@ import requests
 # Configuración de la página
 st.set_page_config(page_title="Detector de Géneros", page_icon="🎵")
 
+# Título y descripción
 st.title("🎵 Clasificador de Géneros Musicales")
 st.write("Pega la letra de una canción y la IA detectará sus géneros.")
 
 # Área de texto
 lyrics = st.text_area("Letra de la canción:", height=300)
 
+# Botón para analizar
 if st.button("Analizar Género", type="primary"):
     if not lyrics.strip():
         st.warning("Por favor, escribe algo de texto.")
@@ -19,7 +21,7 @@ if st.button("Analizar Género", type="primary"):
                 # Llamada a TU API local
                 response = requests.post("http://127.0.0.1:8000/predict", json={"lyrics": lyrics})
                 
-                if response.status_code == 200:
+                if response.status_code == 200: # Esto significa que la solicitud fue exitosa
                     data = response.json()
                     generos = data["genres"]
                     

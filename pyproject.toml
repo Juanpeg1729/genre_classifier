@@ -1,10 +1,11 @@
 [project]
 name = "genre-classifier"
 version = "0.1.0"
-description = "Add your description here"
+description = "Genre Classifier Project"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "datasets>=4.4.1",
     "fastapi>=0.122.0",
     "numpy>=2.3.5",
     "pandas>=2.3.3",
