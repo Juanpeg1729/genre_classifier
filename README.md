@@ -64,7 +64,7 @@ El código sigue una arquitectura de paquete modular, separando configuración, 
 
 ---
 
-# 🕹️ Automatización (Makefile)
+## 🕹️ Automatización (Makefile)
 Para facilitar el uso, el proyecto incluye un Makefile que abstrae los comandos complejos.
 
 | Comando | Descripción |
@@ -122,7 +122,7 @@ make install  # Ejecuta 'uv sync'
 
 ---
 
-# 🧠 Dashboard & API
+## 🧠 Dashboard & API
 
 El sistema expone dos interfaces principales para interactuar con el modelo:
 
@@ -144,11 +144,11 @@ El sistema expone dos interfaces principales para interactuar con el modelo:
 
 ---
 
-# ⚙️ Metodología de Data Science
+## ⚙️ Metodología de Data Science
 
 El mayor reto de este proyecto no fue el modelo, sino los datos. Se aplicó una estrategia de Data-Centric AI para pasar de un rendimiento pobre a un modelo robusto.
 
-1. Ingeniería de Datos y Limpieza:
+1. **Ingeniería de Datos y Limpieza:**
 
     * Filtrado de Idioma: Se detectó que el dataset contenía múltiples idiomas. Se utilizó langdetect para filtrar y conservar solo el corpus en inglés (97% del total), optimizando el uso de roberta-base (monolingüe).
 
@@ -156,7 +156,7 @@ El mayor reto de este proyecto no fue el modelo, sino los datos. Se aplicó una 
 
     * Limpieza de Texto: Eliminación de metadatos de Genius (ej: [Chorus], [Verse 1]) mediante Regex.
 
-2. Modelado:
+2. **Modelado:**
 
     * Arquitectura: RoBERTa (Robustly optimized BERT approach). Se eligió sobre DistilBERT por su capacidad superior para entender contextos complejos, ironía y slang en inglés.
 
@@ -164,7 +164,7 @@ El mayor reto de este proyecto no fue el modelo, sino los datos. Se aplicó una 
 
 ---
 
-# 📊 Entrenamiento y Resultados
+## 📊 Entrenamiento y Resultados
 
 El modelo fue entrenado utilizando Google Colab (T4 GPU) con técnicas de optimización de memoria:
 
