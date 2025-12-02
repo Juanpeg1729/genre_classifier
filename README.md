@@ -64,6 +64,20 @@ El código sigue una arquitectura de paquete modular, separando configuración, 
 
 ---
 
+# 🕹️ Automatización (Makefile)
+Para facilitar el uso, el proyecto incluye un Makefile que abstrae los comandos complejos.
+
+| Comando | Descripción |
+| :--- | :--- |
+| `make install` | Instala las dependencias con `uv`. |
+| `make api` | Levanta el servidor de la API (FastAPI) en local. |
+| `make ui` | Lanza la aplicación web (Streamlit). |
+| `make docker-build` | Construye la imagen de Docker. |
+| `make docker-up` | Levanta todo el sistema (API + Dashboard) en contenedores. |
+| `make docker-down` | Apaga todos los contenedores. |
+
+---
+
 ## 💻 Instalación y Uso
 
 Tienes dos formas de ejecutar el proyecto: la recomendada (Docker) para replicar el entorno de producción, o la local para desarrollo.
@@ -110,17 +124,23 @@ make install  # Ejecuta 'uv sync'
 
 # 🧠 Dashboard & API
 
-El sistema cuenta con dos puntos de entrada:
+El sistema expone dos interfaces principales para interactuar con el modelo:
 
-1. **API REST (FastAPI):** Recibe un JSON con la letra de la canción y devuelve una lista de géneros con sus puntuaciones de confianza. Diseñada para integración M2M (Machine-to-Machine).
+1. **Dashboard Interactivo (Streamlit)**
+    Diseñado para usuarios finales. Permite:
 
-2. **Web App (Streamlit):** Una interfaz amigable donde el usuario puede pegar la letra de una canción. Incluye:
+    * Entrada de Texto: Un área de texto simple para pegar la letra de la canción a analizar.
 
-    * Validación de entrada.
+    * Visualización de Confianza: Muestra los géneros detectados con barras de progreso que indican la probabilidad (confianza) del modelo para cada etiqueta.
 
-    * Visualización de resultados con barras de confianza.
+    * Feedback en Tiempo Real: Indicadores de carga mientras el modelo realiza la inferencia.
 
-    * Feedback visual de carga e inferencia.
+2. **API REST (FastAPI)**
+    El motor del sistema, diseñado para integraciones.
+
+    * Endpoint /predict: Acepta un JSON con la letra cruda y devuelve un objeto JSON estructurado con los géneros y sus scores.
+
+    * Documentación Automática: Incluye Swagger UI interactivo en /docs para probar los endpoints directamente desde el navegador.
 
 ---
 
