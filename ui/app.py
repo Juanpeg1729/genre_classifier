@@ -1,5 +1,8 @@
 import streamlit as st
 import requests
+import os
+
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 
 # Configuración de la página
 st.set_page_config(page_title="Detector de Géneros", page_icon="🎵")
@@ -19,7 +22,7 @@ if st.button("Analizar Género", type="primary"):
         with st.spinner("Analizando ritmos y patrones..."):
             try:
                 # Llamada a TU API local
-                response = requests.post("http://127.0.0.1:8000/predict", json={"lyrics": lyrics})
+                response = requests.post(f"{API_URL}/predict", json={"lyrics": lyrics})
                 
                 if response.status_code == 200: # Esto significa que la solicitud fue exitosa
                     data = response.json()

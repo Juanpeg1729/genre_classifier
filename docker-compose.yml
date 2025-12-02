@@ -1,0 +1,26 @@
+services:
+  # Servicio 1: El Cerebro (Backend)
+  api:
+    build: .
+    container_name: spotify-api
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./model:/app/model # Opcional: si quisieras montar modelos locales
+    environment:
+      - HF_TOKEN=${HF_TOKEN} # Por si necesitas descargar modelos privados
+
+  # Servicio 2: La Cara (Frontend)
+  ui:
+    build: .
+    container_name: spotify-ui
+    # Aquí sobreescribimos el comando para ejecutar Streamlit
+    command: streamlit run ui/app.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      # ¡Aquí está la magia! Le decimos a Streamlit dónde está la API dentro de Docker
+      - API_URL=http://api:8000 
+    depends_on:
+      - api
