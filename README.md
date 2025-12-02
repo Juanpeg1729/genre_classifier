@@ -1,15 +1,15 @@
 # 🎵 Spotify Genre Classifier: End-to-End NLP Pipeline
 
-Este proyecto desarrolla un flujo de trabajo completo (End-to-End MLOps) para la clasificación de géneros musicales utilizando Procesamiento de Lenguaje Natural (NLP). El sistema predice múltiples géneros para una canción basándose únicamente en su letra, utilizando modelos Transformer.
+Este proyecto implementa un sistema End-to-End MLOps para la clasificación de géneros musicales utilizando Procesamiento de Lenguaje Natural (NLP). El modelo es capaz de predecir múltiples géneros (Multi-Label) para una canción basándose únicamente en su letra, utilizando modelos Transformer basado en BERT (RoBERTa).
 
-El enfoque principal de este repositorio es presentar una arquitectura de Deep Learning moderna y eficiente, desacoplando el entrenamiento pesado (en GPU) de la inferencia ligera (en CPU). El proyecto abarca desde la limpieza de texto y tokenización hasta el fine-tuning de DistilBERT con optimizaciones de memoria (FP16, Gradient Accumulation) y su despliegue como microservicio.
+El repositorio demuestra una arquitectura de software moderna, desacoplando el entrenamiento (realizado en GPU en la nube) de la inferencia (desplegada mediante microservicios Dockerizados), con un enfoque riguroso en la limpieza de datos y la optimización de recursos.
 
 ---
 
 ## 📋 Tabla de Contenidos
 - [Arquitectura y Tech Stack](#-arquitectura-y-tech-stack)
 - [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Instalación y Uso](#-instalación-y-uso)
+- [Instalación y Uso (Docker & Local)](#-instalación-y-uso)
 - [Dashboard & API](#-dashboard--api)
 - [Metodología de ML](#-metodología-de-ml)
 - [Entrenamiento y resultados](#-entrenamiento-resultado)
@@ -24,14 +24,14 @@ El proyecto integra herramientas modernas para crear un sistema robusto, modular
 * **Lenguaje:** Python 3.11
 * **Gestión de Dependencias:** [uv](https://github.com/astral-sh/uv) (Gestor de paquetes de alto rendimiento).
 * **Modelado (NPL):** 
-    * **Hugging Face Transformers:** Tokenización y arquitectura del modelo.
+    * **Hugging Face Transformers:** Fine-tuning de roberta-base.
     * **PyTorch:** motor de cálculo tensorial.
-    * **DistilBert:** modelo base (multilingual Cased) optimizado para eficiencia.
-* **Infraestructura del modelo: Hugging Face Hub** (Alojamiento del modelo entrenado para mantener el repositorio ligero). 
+* **Infraestructura del modelo: Hugging Face Hub** (Registro de modelos en la nube). El contenedor descarga el modelo automáticamente al arrancar, manteniendo el repositorio ligero. 
 * **Interfaces:** 
     * **FastAPI:** Backend para servir predicciones.
     * **Streamlit:** Frontend interactivo para el usuario final.
 * **Entrenamiento:** Google Colab (T4 GPU) con estrategias de ahorro de memoria.
+* **Despliegue:** Docker & Docker Compose para orquestación de contenedores.
 
 ---
 
@@ -41,20 +41,24 @@ El código sigue una arquitectura de paquete modular, separando configuración, 
 
 ```text
 .
-├── api/                 # 🔌 Backend (FastAPI)
+├── api/                 # 🔌 Microservicio Backend (FastAPI)
 │   ├── __init__.py
-│   └── main.py          # Endpoints de la API
-├── notebooks/           # 📓 Notebooks de Jupyter/Colab
-│   └── training.ipynb   # Pipeline de entrenamiento completo
-├── src/                 # 🧠 Lógica del Negocio
+│   └── main.py          # Endpoints y lógica de servidor
+├── notebooks/           # 📓 Documentación ejecutable (Training Log)
+│   └── training.ipynb   # Pipeline completo: Carga, Limpieza, Training, Upload
+├── src/                 # 🧠 Lógica del Negocio compartida
 │   ├── __init__.py
-│   ├── predictor.py     # Clase para descarga e inferencia del modelo
-│   └── preprocessing.py # Limpieza y normalización de texto
-├── ui/                  # 🎨 Frontend (Streamlit)
+│   ├── predictor.py     # Clase que descarga el modelo del Hub y ejecuta inferencia
+│   └── preprocessing.py # Normalización de texto (Regex)
+├── ui/                  # 🎨 Microservicio Frontend (Streamlit)
 │   └── app.py           # Interfaz de usuario
-├── .gitignore           # Archivos ignorados
-├── pyproject.toml       # Definición de dependencias (uv)
-├── uv.lock              # Versiones exactas (Lockfile)
+├── .dockerignore        # Exclusiones para optimizar imágenes
+├── .gitignore           # Exclusiones de git
+├── docker-compose.yml   # Orquestación de servicios (API + UI)
+├── Dockerfile           # Receta de imagen (Multi-stage build con uv)
+├── Makefile             # 🕹️ Automatización de comandos
+├── pyproject.toml       # Definición de dependencias
+├── uv.lock              # Lockfile para reproducibilidad exacta
 └── README.md            # Documentación
 ``` 
 
@@ -62,39 +66,45 @@ El código sigue una arquitectura de paquete modular, separando configuración, 
 
 ## 💻 Instalación y Uso
 
-Este proyecto utiliza **uv** para garantizar la instalación reproducible y rápida. 
+Tienes dos formas de ejecutar el proyecto: la recomendada (Docker) para replicar el entorno de producción, o la local para desarrollo.
 
-1. **Clonar y preparar:**
+**Opción A: Docker (Recomendada 🐳)**
 
-    ```bash 
-    git clone https://github.com/Juanpeg1729/genre-classifier.git
-    cd genre-classifier
-    ```
-2. **Instalar dependencias:**
-    uv creará automáticamente el entorno virtual y sincronizará las dependencias.
+1. Levanta todo el sistema sin preocuparte por dependencias de Python o versiones de CUDA.
 
-    ```bash
-    uv sync
-    ```
+Construir y Arrancar:
 
-3. **Ejecutar la aplicación:**
-    Para probar el sistema completo necesitarás dos terminales (una para el backend y otra para el frontend).
+```bash
+make docker-up
+```
+(La primera vez tardará unos minutos mientras descarga las imágenes y el modelo RoBERTa de 500MB).
 
-    **Terminal 1: Leventar la API.** El modelo se descargará automáticamente de Hugging Face la primera vez.
+2. **Acceder:**
 
-    ```bash
-    uv run uvicorn api.main:app --reload
-    ```
+    * 🎨 Web App: Abre http://localhost:8501 en tu navegador.
 
-    La API estará disponible en: http://127.0.0.1:8000/docs
+    * ⚙️ API Docs: Abre http://localhost:8000/docs.
 
-    **Terminal 2: Lanzar el Dashboard.** 
+3. Detener:
 
-    ```bash
-    uv run streamlit run ui/app.py
-    ```
+```bash
+make docker-down
+```
 
-    El navegador se abrirá automáticamente en: http://localhost:8501
+**Opción B: Ejecución Local (con uv)**
+
+Si deseas editar el código.
+
+1. Instalar dependencias:
+
+```bash
+make install  # Ejecuta 'uv sync'
+```
+2. Ejecutar servicios (en terminales separadas):
+
+    * API: make api
+
+    * Frontend: make ui
 
 ---
 
@@ -114,47 +124,41 @@ El sistema cuenta con dos puntos de entrada:
 
 ---
 
-# ⚙️ Metodología de ML
+# ⚙️ Metodología de Data Science
 
-El núcleo del proyecto es un problema de **Clasificación Multi-Etiqueta** (una canción puede ser Pop y Rock simultáneamente).
+El mayor reto de este proyecto no fue el modelo, sino los datos. Se aplicó una estrategia de Data-Centric AI para pasar de un rendimiento pobre a un modelo robusto.
 
-1. Ingeniería de Datos:
+1. Ingeniería de Datos y Limpieza:
 
-    * Limpieza de ruido en letras (eliminación de metadatos como [Chorus], [Verse]).
+    * Filtrado de Idioma: Se detectó que el dataset contenía múltiples idiomas. Se utilizó langdetect para filtrar y conservar solo el corpus en inglés (97% del total), optimizando el uso de roberta-base (monolingüe).
 
-    * Codificación de etiquetas mediante MultiLabelBinarizer (One-Hot Encoding para 80+ géneros).
+    * Agrupación de Géneros (Label Engineering): El dataset original contenía 88 micro-géneros desbalanceados (ej: cloud rap, trap, gangster rap). Se desarrolló un algoritmo de mapeo para consolidarlos en 14 Macro-Géneros sólidos (Hip-Hop, Rock, Pop, Metal, etc.), mejorando drásticamente la señal de aprendizaje.
 
-1. Arquitectura del Modelo:
+    * Limpieza de Texto: Eliminación de metadatos de Genius (ej: [Chorus], [Verse 1]) mediante Regex.
 
-    * Se utilizó DistilBERT-base-multilingual-cased.
+2. Modelado:
 
-    * Por qué: Ofrece un balance óptimo entre rendimiento (97% de BERT) y velocidad/peso (40% más ligero), crucial para una inferencia en tiempo real.
+    * Arquitectura: RoBERTa (Robustly optimized BERT approach). Se eligió sobre DistilBERT por su capacidad superior para entender contextos complejos, ironía y slang en inglés.
 
-3. Entrenamiento Optimizado (GPU):
-
-    * Mixed Precision (FP16): Reducción del uso de VRAM a la mitad.
-
-    * Gradient Accumulation: Simulación de batches grandes (Size 16) en hardware limitado.
-
-    * Estrategia de Guardado: Checkpoints automáticos en la nube y recuperación ante fallos.
-
-4. Ajuste de Umbral:
-
-    * Dado que es un problema multi-label, se optimizó el umbral de decisión (Threshold = 0.2) para maximizar el F1-Score, evitando falsos negativos comunes en modelos conservadores.
+    * Estrategia Multi-Label: Se utilizó BCEWithLogitsLoss para permitir que una canción pertenezca a múltiples géneros simultáneamente (ej: Rock y Pop).
 
 ---
 
 # 📊 Entrenamiento y Resultados
 
-El modelo fue entrenado con un dataset de 5.000 canciones.
+El modelo fue entrenado utilizando Google Colab (T4 GPU) con técnicas de optimización de memoria:
 
-* Pérdida (Loss): Se utilizó BCEWithLogitsLoss (Binary Cross Entropy) adaptada para clasificación multi-etiqueta.
+* Dataset: ~50.000 canciones.
 
-* Métricas: Se priorizó el F1-Macro y el ROC-AUC para evaluar el rendimiento en clases desbalanceadas.
+* Optimizaciones: Mixed Precision (FP16) y Gradient Accumulation (Batch Size efectivo = 16).
 
-* Resultados: El modelo demuestra una capacidad sólida para distinguir géneros principales y subgéneros correlacionados.
+* Métricas:
 
-El modelo final está alojado públicamente en Hugging Face Hub para facilitar su despliegue sin sobrecargar el repositorio.
+    * El modelo final utiliza un umbral de decisión optimizado de 0.2. Esto corrige el sesgo conservador de la red neuronal, maximizando el F1-Score y la Accuracy en un problema de clasificación multietiqueta.
+
+    * El modelo final alcanza un ROC-AUC > 0.90, demostrando una excelente capacidad de separación entre clases.
+
+El modelo entrenado se encuentra alojado públicamente en Hugging Face Hub: Juanpeg1729/genre-classifier.
 
 ---
 
