@@ -1,6 +1,6 @@
 # 🎵 Spotify Genre Classifier: End-to-End NLP Pipeline
 
-![Status](https://img.shields.io/badge/status-completed-green)
+![Status](https://img.shields.io/badge/status-in--progress-green)
 ![Python Version](https://img.shields.io/badge/python-3.11-blue)
 ![uv](https://img.shields.io/badge/uv-enabled-purple)
 ![Docker](https://img.shields.io/badge/docker-enabled-blue)
