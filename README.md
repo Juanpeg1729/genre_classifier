@@ -1,6 +1,15 @@
 # 🎵 Spotify Genre Classifier: End-to-End NLP Pipeline
 
-Este proyecto implementa un sistema End-to-End MLOps para la clasificación de géneros musicales utilizando Procesamiento de Lenguaje Natural (NLP). El modelo es capaz de predecir múltiples géneros (Multi-Label) para una canción basándose únicamente en su letra, utilizando modelos Transformer basado en BERT (RoBERTa).
+![Status](https://img.shields.io/badge/status-completed-green)
+![Python Version](https://img.shields.io/badge/python-3.11-blue)
+![uv](https://img.shields.io/badge/uv-enabled-purple)
+![Docker](https://img.shields.io/badge/docker-enabled-blue)
+![HuggingFace](https://img.shields.io/badge/Hugging%20Face-RoBERTa-yellow)
+![FastAPI](https://img.shields.io/badge/FastAPI-ready-009688)
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=Streamlit&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+Este proyecto implementa un sistema End-to-End MLOps para la clasificación de géneros musicales utilizando Procesamiento de Lenguaje Natural (NPL). El modelo es capaz de predecir múltiples géneros (Multi-Label) para una canción basándose únicamente en su letra, utilizando modelos Transformer basado en BERT (RoBERTa).
 
 El repositorio demuestra una arquitectura de software moderna, desacoplando el entrenamiento (realizado en GPU en la nube) de la inferencia (desplegada mediante microservicios Dockerizados), con un enfoque riguroso en la limpieza de datos y la optimización de recursos.
 
@@ -65,6 +74,7 @@ El código sigue una arquitectura de paquete modular, separando configuración, 
 ---
 
 ## 🕹️ Automatización (Makefile)
+
 Para facilitar el uso, el proyecto incluye un Makefile que abstrae los comandos complejos.
 
 | Comando | Descripción |
@@ -86,12 +96,13 @@ Tienes dos formas de ejecutar el proyecto: la recomendada (Docker) para replicar
 
 1. Levanta todo el sistema sin preocuparte por dependencias de Python o versiones de CUDA.
 
-Construir y Arrancar:
+    Construir y Arrancar:
 
-```bash
-make docker-up
-```
-(La primera vez tardará unos minutos mientras descarga las imágenes y el modelo RoBERTa de 500MB).
+    ```bash
+    make docker-up
+    ```
+
+    (La primera vez tardará unos minutos mientras descarga las imágenes y el modelo RoBERTa de 500MB).
 
 2. **Acceder:**
 
@@ -101,20 +112,21 @@ make docker-up
 
 3. Detener:
 
-```bash
-make docker-down
-```
+    ```bash
+    make docker-down
+    ```
 
 **Opción B: Ejecución Local (con uv)**
 
 Si deseas editar el código.
 
-1. Instalar dependencias:
+1. **Instalar dependencias:**
 
-```bash
-make install  # Ejecuta 'uv sync'
-```
-2. Ejecutar servicios (en terminales separadas):
+    ```bash
+    make install  # Ejecuta 'uv sync'
+    ```
+
+2. **Ejecutar servicios (en terminales separadas):**
 
     * API: make api
 
@@ -127,6 +139,7 @@ make install  # Ejecuta 'uv sync'
 El sistema expone dos interfaces principales para interactuar con el modelo:
 
 1. **Dashboard Interactivo (Streamlit)**
+
     Diseñado para usuarios finales. Permite:
 
     * Entrada de Texto: Un área de texto simple para pegar la letra de la canción a analizar.
@@ -136,6 +149,7 @@ El sistema expone dos interfaces principales para interactuar con el modelo:
     * Feedback en Tiempo Real: Indicadores de carga mientras el modelo realiza la inferencia.
 
 2. **API REST (FastAPI)**
+
     El motor del sistema, diseñado para integraciones.
 
     * Endpoint /predict: Acepta un JSON con la letra cruda y devuelve un objeto JSON estructurado con los géneros y sus scores.
