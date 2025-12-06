@@ -202,5 +202,5 @@ El modelo entrenado se encuentra alojado públicamente en Hugging Face Hub: Juan
 **Juan Pedro García Sanz**
 
 * **GitHub:** [@Juanpeg1729](https://github.com/Juanpeg1729)
-* **LinkedIn:** [Perfil de LinkedIn](https://www.linkedin.com/in/juan-pedro-garcía-sanz-443b31343)
+* **LinkedIn:** [Perfil de LinkedIn](https://www.linkedin.com/in/juanpedrogarciasanz)
 * **Hugging Face:** [@Juanpeg1279](https://huggingface.co/Juanpeg1729)
