@@ -3,5 +3,5 @@
 __pycache__
 notebooks
 *.ipynb
-model # El modelo se baja de internet, no lo copiamos
+model 
 tests

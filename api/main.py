@@ -7,7 +7,7 @@ app = FastAPI(title="Spotify Genre Classifier API")
 print("Iniciando API y cargando modelo...")
 predictor = GenrePredictor()
 
-@app.post("/predict") # Este decorador define el endpoint /predict
+@app.post("/predict")
 def predict_genre(lyrics: dict):
     # Recibe un JSON con la letra de la canción y predice el género
     text = lyrics.get("lyrics", "")
