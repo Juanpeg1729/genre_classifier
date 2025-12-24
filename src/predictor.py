@@ -1,42 +1,58 @@
 import torch
+import os
+from pathlib import Path
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from src.preprocessing import limpiar_texto
 
 # Modelo de Clasificación de Géneros Musicales desde Hugging Face
 MODEL_ID = "Juanpeg1729/genre-classifier"  # ID del modelo en Hugging Face
+LOCAL_MODEL_PATH = "./model"
+
+# Token de Hugging Face (opcional para modelos públicos, necesario para privados)
+HF_TOKEN = os.getenv("HF_TOKEN", None)
 
 class GenrePredictor:
     def __init__(self):
-        # Asigno el dispositivo (GPU si está disponible, sino CPU)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print(f"Cargando modelo desde {MODEL_ID} en {self.device}...")
         
-        # Descargo el tokenizador y el modelo (o cargo desde caché si ya está descargado)
-        self.tokenizer = AutoTokenizer.from_pretrained(MODEL_ID) # Cargo el tokenizador
-        self.model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID) # Cargo el modelo
-        self.model.to(self.device) # Muevo el modelo al dispositivo adecuado (GPU/CPU)
-        self.model.eval() # Pongo el modelo en modo evaluación (desactiva dropout, etc.)
+        # Comprobamos si existe el archivo 'config.json' en la carpeta local.
+        # Si existe, significa que ya lo descargamos alguna vez.
+        if os.path.exists(os.path.join(LOCAL_MODEL_PATH, "config.json")):
+            print(f"✅ Modelo encontrado en caché local: {LOCAL_MODEL_PATH}")
+            model_to_load = LOCAL_MODEL_PATH
+        else:
+            print(f"⬇️ Modelo no encontrado en local. Descargando de Hugging Face: {MODEL_ID}...")
+            model_to_load = MODEL_ID
+
+        # Cargamos (ya sea del disco o de internet)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_to_load)
+        self.model = AutoModelForSequenceClassification.from_pretrained(model_to_load)
+        
+        # Guardamos (Solo si hemos tenido que descargar de internet)
+        if model_to_load == MODEL_ID:
+            print(f"💾 Guardando modelo en {LOCAL_MODEL_PATH} para futuras ejecuciones...")
+            self.tokenizer.save_pretrained(LOCAL_MODEL_PATH)
+            self.model.save_pretrained(LOCAL_MODEL_PATH)
+
+        # Configuración final
+        self.model.to(self.device)
+        self.model.eval()
 
     def predict(self, text, threshold=0.2):
-        clean_text = limpiar_texto(text) # Limpio el texto usando la función definida en preprocessing.py
-        
-        # Tokenizamos
+        clean_text = limpiar_texto(text)
         inputs = self.tokenizer(
             clean_text, 
-            return_tensors="pt", # Usar tensores de PyTorch
-            truncation=True, # Truncar si es muy largo
-            padding=True, # Padding automático. Esto es útil para batchs. Lo que hace es rellenar con ceros hasta el tamaño del input más largo
-            max_length=512 # Longitud máxima del input
-        ).to(self.device) # Muevo los tensores al dispositivo adecuado (GPU/CPU)
+            return_tensors="pt", 
+            truncation=True, 
+            padding=True, 
+            max_length=512
+        ).to(self.device)
 
-        # Inferencia (sin calcular gradientes)
         with torch.no_grad():
-            logits = self.model(**inputs).logits # **inputs desempaqueta el diccionario de inputs.
+            logits = self.model(**inputs).logits
         
-        # Convertir logits a probabilidades (Sigmoide)
-        probs = torch.sigmoid(logits).cpu().numpy()[0] # Muevo a CPU y convierto a numpy array
+        probs = torch.sigmoid(logits).cpu().numpy()[0]
         
-        # Filtrar por umbral y formatear. Este bloque crea una lista de diccionarios con los géneros y sus puntuaciones
         results = []
         id2label = self.model.config.id2label
         
@@ -47,5 +63,4 @@ class GenrePredictor:
                     "score": float(score)
                 })
         
-        # Ordenar de mayor a menor confianza
         return sorted(results, key=lambda x: x["score"], reverse=True)

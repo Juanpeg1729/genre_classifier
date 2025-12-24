@@ -1,7 +1,5 @@
 .PHONY: help install api ui docker-build docker-up docker-down clean
 
-.DEFAULT_GOAL := help
-
 help: ## Muestra esta ayuda
 	@echo "Comandos disponibles:"
 	@echo ""

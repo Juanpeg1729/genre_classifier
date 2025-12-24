@@ -3,5 +3,5 @@
 __pycache__
 notebooks
 *.ipynb
-model 
+model/
 tests
