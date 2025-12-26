@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 from src.predictor import GenrePredictor
 
 app = FastAPI(title="Spotify Genre Classifier API")
@@ -7,10 +8,14 @@ app = FastAPI(title="Spotify Genre Classifier API")
 print("Iniciando API y cargando modelo...")
 predictor = GenrePredictor()
 
+# Definimos la forma de los datos de entrada
+class SongRequest(BaseModel):
+    lyrics: str
+
 @app.post("/predict")
-def predict_genre(lyrics: dict):
+def predict_genre(request: SongRequest):
     # Recibe un JSON con la letra de la canción y predice el género
-    text = lyrics.get("lyrics", "")
+    text = request.lyrics
     results = predictor.predict(text)
     return {"genres": results}
 

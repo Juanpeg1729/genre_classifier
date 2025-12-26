@@ -53,15 +53,17 @@ El código sigue una arquitectura de paquete modular, separando configuración, 
 .
 ├── api/                 # 🔌 Microservicio Backend (FastAPI)
 │   ├── __init__.py
-│   └── main.py          # Endpoints y lógica de servidor
+│   └── main.py          # Endpoints con validación Pydantic
+├── model/               # 🤖 Caché local del modelo (se crea automáticamente)
 ├── notebooks/           # 📓 Documentación ejecutable (Training Log)
 │   └── training.ipynb   # Pipeline completo: Carga, Limpieza, Training, Upload
 ├── src/                 # 🧠 Lógica del Negocio compartida
 │   ├── __init__.py
-│   ├── predictor.py     # Clase que descarga el modelo del Hub y ejecuta inferencia
+│   ├── predictor.py     # Clase que gestiona el modelo (descarga y caché)
 │   └── preprocessing.py # Normalización de texto (Regex)
 ├── ui/                  # 🎨 Microservicio Frontend (Streamlit)
 │   └── app.py           # Interfaz de usuario
+├── .env.example         # Plantilla para variables de entorno
 ├── .dockerignore        # Exclusiones para optimizar imágenes
 ├── .gitignore           # Exclusiones de git
 ├── docker-compose.yml   # Orquestación de servicios (API + UI)
@@ -80,24 +82,40 @@ Para facilitar el uso, el proyecto incluye un Makefile que abstrae los comandos 
 
 | Comando | Descripción |
 | :--- | :--- |
+| `make help` | Muestra todos los comandos disponibles. |
 | `make install` | Instala las dependencias con `uv`. |
 | `make api` | Levanta el servidor de la API (FastAPI) en local. |
 | `make ui` | Lanza la aplicación web (Streamlit). |
 | `make docker-build` | Construye la imagen de Docker. |
 | `make docker-up` | Levanta todo el sistema (API + Dashboard) en contenedores. |
 | `make docker-down` | Apaga todos los contenedores. |
+| `make clean` | Limpia archivos de caché de Python. |
 
 ---
 
 ## 💻 Instalación y Uso
 
-Tienes dos formas de ejecutar el proyecto: la recomendada (Docker) para replicar el entorno de producción, o la local para desarrollo.
+### Configuración inicial (opcional)
 
-**Opción A: Docker (Recomendada 🐳)**
+Si quieres usar tu token de Hugging Face (recomendado para evitar límites de descarga):
+
+1. Copia el archivo de ejemplo:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edita `.env` y añade tu token (consíguelo en https://huggingface.co/settings/tokens):
+   ```
+   HF_TOKEN=hf_tu_token_real_aqui
+   ```
+
+**Nota:** El token no es necesario si el modelo es público, pero ayuda a evitar límites de descarga.
+
+---
+
+### Opción A: Docker (Recomendada 🐳)
 
 1. Levanta todo el sistema sin preocuparte por dependencias de Python o versiones de CUDA.
-
-    Construir y Arrancar:
 
     ```bash
     make docker-up
@@ -117,21 +135,29 @@ Tienes dos formas de ejecutar el proyecto: la recomendada (Docker) para replicar
     make docker-down
     ```
 
-**Opción B: Ejecución Local (con uv)**
+### Opción B: Ejecución Local (con uv)
 
-Si deseas editar el código.
+Si deseas editar el código o desarrollar localmente:
 
 1. **Instalar dependencias:**
 
     ```bash
-    make install  # Ejecuta 'uv sync'
+    make install
     ```
 
 2. **Ejecutar servicios (en terminales separadas):**
 
-    * API: make api
+    ```bash
+    make api  # Terminal 1: Inicia la API
+    make ui   # Terminal 2: Inicia la interfaz
+    ```
 
-    * Frontend: make ui
+3. **Acceder:**
+
+    * 🎨 Web App: http://localhost:8501
+    * ⚙️ API Docs: http://localhost:8000/docs
+
+**Nota:** El modelo se descarga automáticamente la primera vez y se guarda en la carpeta `model/` para futuras ejecuciones.
 
 ---
 
@@ -153,9 +179,11 @@ El sistema expone dos interfaces principales para interactuar con el modelo:
 
     El motor del sistema, diseñado para integraciones.
 
-    * Endpoint /predict: Acepta un JSON con la letra cruda y devuelve un objeto JSON estructurado con los géneros y sus scores.
+    * Endpoint `/predict`: Acepta un JSON con la letra y devuelve los géneros detectados.
 
-    * Documentación Automática: Incluye Swagger UI interactivo en /docs para probar los endpoints directamente desde el navegador.
+    * Validación automática con Pydantic: Garantiza que los datos de entrada sean correctos.
+
+    * Documentación interactiva: Swagger UI disponible en `/docs` para probar la API desde el navegador.
 
 ---
 
