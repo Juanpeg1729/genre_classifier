@@ -56,7 +56,7 @@ El código está organizado en módulos separados para facilitar el mantenimient
 │   └── main.py          # Endpoints con validación de datos (Pydantic)
 ├── model/               # Caché local del modelo (se crea automáticamente)
 ├── notebooks/           # Notebook con el proceso de entrenamiento
-│   └── training.ipynb   # Pipeline: Carga, Limpieza, Entrenamiento y Subida
+│   └── genre_classification_colab.ipynb   # Pipeline: Carga, Limpieza, Entrenamiento y Subida
 ├── src/                 # Lógica principal del proyecto
 │   ├── __init__.py
 │   ├── predictor.py     # Gestión del modelo (descarga y predicciones)
