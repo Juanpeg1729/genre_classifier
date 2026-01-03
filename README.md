@@ -51,7 +51,7 @@ El código está organizado en módulos separados para facilitar el mantenimient
 
 ```text
 .
-├── api/                 # 🔌 API REST (FastAPI)
+├── api/                 # API REST (FastAPI)
 │   ├── __init__.py
 │   └── main.py          # Endpoints con validación de datos (Pydantic)
 ├── model/               # Caché local del modelo (se crea automáticamente)
