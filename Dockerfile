@@ -11,10 +11,7 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 
 # Instalamos las dependencias del sistema
-RUN uv sync
+RUN uv sync --frozen
 
 # Copiamos el resto del código
 COPY . .
-
-# Añadimos el entorno virtual al PATH para no tener que escribir "uv run" todo el rato
-ENV PATH="/app/.venv/bin:$PATH"
